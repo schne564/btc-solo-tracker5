@@ -6,19 +6,6 @@ function formatWithSuffix(value) {
   return value?.toLocaleString?.() ?? "Unavailable";
 }
 
-function sanitizeOdds(value) {
-  if (!value || typeof value !== "string") return "Unavailable";
-  if (value.includes("e+") || value.includes("Infinity") || value === "0.00000000%") return "Unavailable";
-  return value;
-}
-
-function setOddsWithTooltip(id, value) {
-  const el = document.getElementById(id);
-  const sanitized = sanitizeOdds(value);
-  el.textContent = sanitized;
-  el.title = sanitized === "Unavailable" ? "Odds too small to display meaningfully" : value;
-}
-
 let previousBestShare = 0;
 
 function notifyNewBestShare(newShare) {
