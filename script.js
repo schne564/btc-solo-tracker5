@@ -28,15 +28,16 @@ let previousShares = 0;
 
 function notifyMilestone(elementId, message) {
   const elem = document.getElementById(elementId);
-  elem.classList.add("highlight");
+  elem.classList.add("highlight", "pulse"); // or "shake"
 
   const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
   audio.play();
 
   setTimeout(() => {
-    elem.classList.remove("highlight");
+    elem.classList.remove("highlight", "pulse", "shake");
   }, 2000);
 }
+
 
 function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
