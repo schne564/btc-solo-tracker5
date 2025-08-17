@@ -5,6 +5,7 @@ function formatWithSuffix(value) {
   if (value >= 1e3) return (value / 1e3).toFixed(2) + " K";
   return value?.toLocaleString?.() ?? "Unavailable";
 }
+
 function calculateSoloOdds(userHashrateTH) {
   const networkHashrateEH = 907; // Current network hashrate in EH/s
   const blocksPerDay = 144;
@@ -25,6 +26,21 @@ function calculateSoloOdds(userHashrateTH) {
   };
 }
 
+let previousBestShare = 0;
+
+function notifyNewBestShare(newShare) {
+  const shareElem = document.getElementById("bestshare");
+  shareElem.classList.add("highlight");
+
+  // Optional sound alert
+  const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+  audio.play();
+
+  setTimeout(() => {
+    shareElem.classList.remove("highlight");
+  }, 2000);
+}
+
 function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
@@ -32,17 +48,26 @@ function updateStats(address) {
     .then((data) => {
       document.getElementById("address").textContent = data.address;
       document.getElementById("workers").textContent = formatWithSuffix(data.workers);
-      document.getElementById("bestshare").textContent = formatWithSuffix(data.bestshare);
+
+      const newBestShare = parseFloat(data.bestshare);
+      document.getElementById("bestshare").textContent = formatWithSuffix(newBestShare);
+      if (newBestShare > previousBestShare) {
+        notifyNewBestShare(newBestShare);
+        previousBestShare = newBestShare;
+      }
+
       document.getElementById("shares").textContent = formatWithSuffix(data.shares);
       document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
       document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
       document.getElementById("soloChance").textContent = data.soloChance;
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
+
       const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
       document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
       document.getElementById("chancePerDay").textContent = odds.chancePerDay;
       document.getElementById("timeEstimate").textContent = odds.timeEstimate;
+
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
     .catch((err) => {
