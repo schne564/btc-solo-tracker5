@@ -8,18 +8,14 @@ function formatWithSuffix(value) {
 }
 
 function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907; // ~907 EH/s
+  const networkHashrateEH = 907; // network hashrate ~ 907 EH/s
   const blocksPerDay = 144;
-
-  const userHashrateH = userHashrateTH * 1e12; // convert TH/s → H/s
-  const networkHashrateH = networkHashrateEH * 1e18; // convert EH/s → H/s
-
+  const userHashrateH = userHashrateTH * 1e12;
+  const networkHashrateH = networkHashrateEH * 1e18;
   const chancePerBlock = userHashrateH / networkHashrateH;
   const oddsPerBlock = 1 / chancePerBlock;
-
   const chancePerDay = chancePerBlock * blocksPerDay;
   const oddsPerDay = 1 / chancePerDay;
-
   const oddsPerHour = 1 / (chancePerDay / 24);
 
   return {
@@ -90,11 +86,27 @@ function updateStats(address) {
       document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
       document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
 
-      // ✅ use raw hashrate value for local calc
-      if (data.hashrate1hrRaw && !isNaN(data.hashrate1hrRaw)) {
-        const hashrateTH = data.hashrate1hrRaw / 1e12; // H/s → TH/s
+      // ✅ Patch: fallback to parsing formatted string if raw hashrate missing
+      let hashrateTH = null;
+      if (data.hashrate1hrRaw) {
+        hashrateTH = data.hashrate1hrRaw / 1e12;
+      } else if (data.hashrate1hr && /\d/.test(data.hashrate1hr)) {
+        // extract number and unit
+        const match = data.hashrate1hr.match(/([\d.]+)\s*([TGMK]?)(?:H\/s)?/i);
+        if (match) {
+          const value = parseFloat(match[1]);
+          const unit = match[2].toUpperCase();
+          const multipliers = { "K": 1e-9, "M": 1e-6, "G": 1e-3, "T": 1, "": 1 };
+          hashrateTH = value * (multipliers[unit] ?? 1);
+        }
+      }
+
+      if (hashrateTH && !isNaN(hashrateTH)) {
         const odds = calculateSoloOdds(hashrateTH);
         document.getElementById("chancePerHour").textContent = odds.chancePerHour;
+        document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
+        document.getElementById("chancePerDay").textContent = odds.chancePerDay;
+        document.getElementById("timeEstimate").textContent = odds.timeEstimate;
       } else {
         document.getElementById("chancePerHour").textContent = "Unavailable";
       }
@@ -117,7 +129,6 @@ function handleAddressSubmit() {
   }
 }
 
-// unlock sound hack
 const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
 silentAudio.play();
 
