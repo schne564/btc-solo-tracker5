@@ -7,15 +7,12 @@ function formatWithSuffix(value) {
 }
 
 function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907; // Current network hashrate in EH/s
+  const networkHashrateEH = 907;
   const blocksPerDay = 144;
-
   const userHashrateH = userHashrateTH * 1e12;
   const networkHashrateH = networkHashrateEH * 1e18;
-
   const chancePerBlock = userHashrateH / networkHashrateH;
   const oddsPerBlock = 1 / chancePerBlock;
-
   const chancePerDay = chancePerBlock * blocksPerDay;
   const oddsPerDay = 1 / chancePerDay;
 
@@ -27,17 +24,17 @@ function calculateSoloOdds(userHashrateTH) {
 }
 
 let previousBestShare = 0;
+let previousShares = 0;
 
-function notifyNewBestShare(newShare) {
-  const shareElem = document.getElementById("bestshare");
-  shareElem.classList.add("highlight");
+function notifyMilestone(elementId, message) {
+  const elem = document.getElementById(elementId);
+  elem.classList.add("highlight");
 
-  // Optional sound alert
   const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
   audio.play();
 
   setTimeout(() => {
-    shareElem.classList.remove("highlight");
+    elem.classList.remove("highlight");
   }, 2000);
 }
 
@@ -52,11 +49,17 @@ function updateStats(address) {
       const newBestShare = parseFloat(data.bestshare);
       document.getElementById("bestshare").textContent = formatWithSuffix(newBestShare);
       if (newBestShare > previousBestShare) {
-        notifyNewBestShare(newBestShare);
+        notifyMilestone("bestshare", `🎉 New Best Share: ${formatWithSuffix(newBestShare)}`);
         previousBestShare = newBestShare;
       }
 
-      document.getElementById("shares").textContent = formatWithSuffix(data.shares);
+      const newShares = parseFloat(data.shares);
+      document.getElementById("shares").textContent = formatWithSuffix(newShares);
+      if (newShares > previousShares) {
+        notifyMilestone("shares", `📈 Shares Increased: ${formatWithSuffix(newShares)}`);
+        previousShares = newShares;
+      }
+
       document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
       document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
       document.getElementById("soloChance").textContent = data.soloChance;
