@@ -45,7 +45,7 @@ function updateStats(address) {
       document.getElementById("chancePerDay").textContent = data.chancePerDay;
       document.getElementById("timeEstimate").textContent = data.timeEstimate;
 
-      document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
+   //   document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
     .catch((err) => {
       console.error("Error fetching data:", err);
