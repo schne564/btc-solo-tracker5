@@ -17,7 +17,7 @@ function notifyNewBestShare(newShare) {
 
   setTimeout(() => {
     shareElem.classList.remove("highlight");
-  }, 2000);
+  }, 3000);
 }
 
 function updateStats(address) {
@@ -69,5 +69,5 @@ window.onload = () => {
   setInterval(() => {
     const currentAddress = document.getElementById("btcAddressInput").value.trim();
     if (currentAddress) updateStats(currentAddress);
-  }, 30000);
+  }, 5000);
 };
