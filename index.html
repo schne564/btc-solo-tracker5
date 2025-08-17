@@ -5,15 +5,118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>BTC Solo Mining Tracker</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
+      color: #fff;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 2.2em;
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: #00ffcc;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00e6b8;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .stats div {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95em;
+    }
+
+    .updated {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #ccc;
+    }
+
+    #milestoneBanner {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 1em;
+      color: #ffcc00;
+      animation: pulse 2s infinite;
+    }
+
+    .highlight {
+      animation: flash 1s ease-in-out;
+    }
+
+    @keyframes flash {
+      0% { background-color: #00ffcc; color: #000; }
+      100% { background-color: transparent; color: #fff; }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div id="milestoneBanner"></div>
+    <div id="milestoneBanner">🎯 Tracking your solo mining journey...</div>
     <h1>BTC Solo Mining Tracker</h1>
     <div class="input-group">
       <input type="text" id="btcAddressInput" placeholder="Enter BTC address" />
       <button onclick="handleAddressSubmit()">Check Stats</button>
-      <button onclick="new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg').play()">Test Sound</button>
+      <button onclick="new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg').play()">🔊 Test Sound</button>
     </div>
     <div class="stats">
       <div><span>Wallet:</span> <span id="address">Unavailable</span></div>
@@ -32,7 +135,5 @@
     <div class="updated" id="lastUpdated">Last updated: Unavailable</div>
   </div>
   <script src="script.js"></script>
-
-
 </body>
 </html>
