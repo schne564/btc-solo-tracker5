@@ -6,8 +6,6 @@ function formatWithSuffix(value) {
   return value?.toLocaleString?.() ?? "Unavailable";
 }
 
-let previousShares = 0;
-
 function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
@@ -16,14 +14,7 @@ function updateStats(address) {
       document.getElementById("address").textContent = data.address;
       document.getElementById("workers").textContent = formatWithSuffix(data.workers);
       document.getElementById("bestshare").textContent = formatWithSuffix(data.bestshare);
-
-      const currentShares = parseFloat(data.shares.replace(/[^\d.]/g, ''));
-      if (currentShares > previousShares) {
-        showNotification(`🎉 Shares increased to ${data.shares}`);
-        previousShares = currentShares;
-      }
       document.getElementById("shares").textContent = formatWithSuffix(data.shares);
-
       document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
       document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
       document.getElementById("soloChance").textContent = data.soloChance;
@@ -40,17 +31,21 @@ function updateStats(address) {
     });
 }
 
-function showNotification(message) {
-  const toast = document.createElement("div");
-  toast.textContent = message;
-  toast.className = "toast";
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
-}
-
 function handleAddressSubmit() {
   const address = document.getElementById("btcAddressInput").value.trim();
   if (address) {
     updateStats(address);
+  } else {
+    alert("Please enter a valid BTC address.");
   }
 }
+
+window.onload = () => {
+  const defaultAddress = "bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn";
+  document.getElementById("btcAddressInput").value = defaultAddress;
+  updateStats(defaultAddress);
+  setInterval(() => {
+    const currentAddress = document.getElementById("btcAddressInput").value.trim();
+    if (currentAddress) updateStats(currentAddress);
+  }, 30000);
+};
