@@ -73,18 +73,18 @@ function updateStats(address) {
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
 
-      const hashrate1hr = parseFloat(data.hashrate1hr);
-      if (!isNaN(hashrate1hr)) {
-        const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
-        document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
-        document.getElementById("chancePerDay").textContent = odds.chancePerDay;
+      document.getElementById("chancePerBlock").textContent = data.chancePerBlock ?? "Unavailable";
+      document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
+      document.getElementById("timeEstimate").textContent = data.timeEstimate
+        ? `${(parseFloat(data.timeEstimate) / 365).toFixed(2)} years`
+        : "Unavailable";
+
+      const hashrateTH = parseFloat(data.hashrate1hr?.replace(/[^\d.]/g, ""));
+      if (!isNaN(hashrateTH)) {
+        const odds = calculateSoloOdds(hashrateTH);
         document.getElementById("chancePerHour").textContent = odds.chancePerHour;
-        document.getElementById("timeEstimate").textContent = odds.timeEstimate;
       } else {
-        document.getElementById("chancePerBlock").textContent = "Unavailable";
-        document.getElementById("chancePerDay").textContent = "Unavailable";
         document.getElementById("chancePerHour").textContent = "Unavailable";
-        document.getElementById("timeEstimate").textContent = "Unavailable";
       }
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
