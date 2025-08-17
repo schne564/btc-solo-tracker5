@@ -28,15 +28,21 @@ let previousShares = 0;
 
 function notifyMilestone(elementId, message) {
   const elem = document.getElementById(elementId);
-  elem.classList.add("highlight", "pulse"); // or "shake"
+  elem.classList.add("highlight", "pulse");
 
   const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
   audio.play();
 
+  const banner = document.getElementById("milestoneBanner");
+  banner.textContent = message;
+  banner.style.display = "block";
+
   setTimeout(() => {
-    elem.classList.remove("highlight", "pulse", "shake");
-  }, 2000);
+    elem.classList.remove("highlight", "pulse");
+    banner.style.display = "none";
+  }, 3000);
 }
+
 
 
 function updateStats(address) {
