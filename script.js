@@ -7,7 +7,7 @@ function formatWithSuffix(value) {
 }
 
 function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907; // Current network hashrate in EH/s
+  const networkHashrateEH = 907;
   const blocksPerDay = 144;
 
   const userHashrateH = userHashrateTH * 1e12;
@@ -26,13 +26,25 @@ function calculateSoloOdds(userHashrateTH) {
   };
 }
 
+function sanitizeOdds(value) {
+  if (!value || typeof value !== "string") return "Unavailable";
+  if (value.includes("e+") || value.includes("Infinity") || value === "0.00000000%") return "Unavailable";
+  return value;
+}
+
+function setOddsWithTooltip(id, value) {
+  const el = document.getElementById(id);
+  const sanitized = sanitizeOdds(value);
+  el.textContent = sanitized;
+  el.title = sanitized === "Unavailable" ? "Odds too small to display meaningfully" : value;
+}
+
 let previousBestShare = 0;
 
 function notifyNewBestShare(newShare) {
   const shareElem = document.getElementById("bestshare");
   shareElem.classList.add("highlight");
 
-  // Optional sound alert
   const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
   audio.play();
 
@@ -59,14 +71,14 @@ function updateStats(address) {
       document.getElementById("shares").textContent = formatWithSuffix(data.shares);
       document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
       document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
-      document.getElementById("soloChance").textContent = data.soloChance;
+      document.getElementById("soloChance").textContent = sanitizeOdds(data.soloChance);
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
 
-      const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
-      document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
-      document.getElementById("chancePerDay").textContent = odds.chancePerDay;
-      document.getElementById("timeEstimate").textContent = odds.timeEstimate;
+      const odds = calculateSoloOdds(parseFloat(data.hashrate1hrRaw));
+      setOddsWithTooltip("chancePerBlock", odds.chancePerBlock);
+      setOddsWithTooltip("chancePerDay", odds.chancePerDay);
+      setOddsWithTooltip("timeEstimate", odds.timeEstimate);
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
