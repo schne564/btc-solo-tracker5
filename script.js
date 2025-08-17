@@ -8,11 +8,10 @@ function formatWithSuffix(value) {
 }
 
 function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907; // estimated BTC network hashrate ~ 907 EH/s
+  const networkHashrateEH = 907;
   const blocksPerDay = 144;
   const userHashrateH = userHashrateTH * 1e12;
   const networkHashrateH = networkHashrateEH * 1e18;
-
   const chancePerBlock = userHashrateH / networkHashrateH;
   const oddsPerBlock = 1 / chancePerBlock;
   const chancePerDay = chancePerBlock * blocksPerDay;
@@ -33,14 +32,11 @@ let previousShares = 0;
 function notifyMilestone(elementId, message) {
   const elem = document.getElementById(elementId);
   elem.classList.add("highlight", "pulse");
-
   const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
   audio.play();
-
   const banner = document.getElementById("milestoneBanner");
   banner.textContent = message;
   banner.style.display = "block";
-
   setTimeout(() => {
     elem.classList.remove("highlight", "pulse");
     banner.style.display = "none";
@@ -57,11 +53,9 @@ function updateStats(address) {
     .then((data) => {
       console.log("Fetched data:", data);
 
-      // direct values
       document.getElementById("address").textContent = data.address ?? "Unavailable";
       document.getElementById("workers").textContent = data.workers ?? "Unavailable";
 
-      // shares
       const newBestShare = parseFloat(data.bestshare);
       document.getElementById("bestshare").textContent = formatWithSuffix(newBestShare);
       if (newBestShare > previousBestShare) {
@@ -76,34 +70,24 @@ function updateStats(address) {
         previousShares = newShares;
       }
 
-      // difficulty + block
       document.getElementById("difficulty").textContent = data.difficulty ?? "Unavailable";
       document.getElementById("lastBlock").textContent = data.lastBlock ?? "Unavailable";
-
-      // misc values
       document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
       document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
-      document.getElementById("chancePerBlock").textContent = data.chancePerBlock ?? "Unavailable";
-      document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
-      document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
 
-      // ✅ Always prefer raw hashrate from Worker
       let hashrateTH = null;
+
       if (typeof data.hashrate1hrRaw === "number" && !isNaN(data.hashrate1hrRaw)) {
-        hashrateTH = data.hashrate1hrRaw / 1e12; // H/s → TH/s
-      } else if (data.hashrate1hr && /\d/.test(data.hashrate1hr)) {
-        // fallback parse formatted string
-        const match = data.hashrate1hr.match(/([\d.]+)\s*([TGMK]?)(?:H\/s)?/i);
-        if (match) {
-          const value = parseFloat(match[1]);
-          const unit = match[2].toUpperCase();
-          const multipliers = { "K": 1e-9, "M": 1e-6, "G": 1e-3, "T": 1, "": 1 };
-          hashrateTH = value * (multipliers[unit] ?? 1);
+        hashrateTH = data.hashrate1hrRaw / 1e12;
+      } else if (data.hashrate1hr && typeof data.hashrate1hr === "string") {
+        const cleaned = data.hashrate1hr.replace(/[^\d.]/g, "");
+        const parsed = parseFloat(cleaned);
+        if (!isNaN(parsed)) {
+          hashrateTH = parsed;
         }
       }
 
-      // recalc odds
       if (hashrateTH && !isNaN(hashrateTH)) {
         const odds = calculateSoloOdds(hashrateTH);
         document.getElementById("chancePerHour").textContent = odds.chancePerHour;
@@ -117,8 +101,7 @@ function updateStats(address) {
         document.getElementById("timeEstimate").textContent = "Unavailable";
       }
 
-      document.getElementById("lastUpdated").textContent =
-        "Last updated: " + new Date().toLocaleTimeString();
+      document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
     .catch((err) => {
       console.error("Error fetching data:", err);
@@ -135,7 +118,6 @@ function handleAddressSubmit() {
   }
 }
 
-// unlock sound hack
 const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
 silentAudio.play();
 
@@ -143,7 +125,6 @@ let soundUnlocked = false;
 function unlockSound() {
   if (soundUnlocked) return;
   soundUnlocked = true;
-
   const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
   audio.play().catch(() => {
     console.warn("Audio unlock attempt failed.");
