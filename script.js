@@ -96,6 +96,23 @@ function handleAddressSubmit() {
 }
 const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
 silentAudio.play(); // triggers audio context
+// Unlock sound on first user interaction
+let soundUnlocked = false;
+
+function unlockSound() {
+  if (soundUnlocked) return;
+  soundUnlocked = true;
+
+  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
+  audio.play().catch(() => {
+    // Some browsers may still block it silently
+    console.warn("Audio unlock attempt failed.");
+  });
+}
+
+// Attach to any user interaction
+document.addEventListener("click", unlockSound);
+document.addEventListener("touchstart", unlockSound);
 
 window.onload = () => {
   const defaultAddress = "bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn";
