@@ -8,14 +8,18 @@ function formatWithSuffix(value) {
 }
 
 function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907; // network hashrate ~ 907 EH/s
+  const networkHashrateEH = 907; // ~907 EH/s
   const blocksPerDay = 144;
-  const userHashrateH = userHashrateTH * 1e12;
-  const networkHashrateH = networkHashrateEH * 1e18;
+
+  const userHashrateH = userHashrateTH * 1e12; // convert TH/s → H/s
+  const networkHashrateH = networkHashrateEH * 1e18; // convert EH/s → H/s
+
   const chancePerBlock = userHashrateH / networkHashrateH;
   const oddsPerBlock = 1 / chancePerBlock;
+
   const chancePerDay = chancePerBlock * blocksPerDay;
   const oddsPerDay = 1 / chancePerDay;
+
   const oddsPerHour = 1 / (chancePerDay / 24);
 
   return {
@@ -86,17 +90,11 @@ function updateStats(address) {
       document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
       document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
 
-      // recalc local odds if hashrate present
-      const rawHashrate = data.hashrate1hr;
-      if (rawHashrate && /\d/.test(rawHashrate)) {
-        // expect "126 TH/s"
-        const hashrateTH = parseFloat(rawHashrate.replace(/[^\d.]/g, ""));
-        if (!isNaN(hashrateTH)) {
-          const odds = calculateSoloOdds(hashrateTH);
-          document.getElementById("chancePerHour").textContent = odds.chancePerHour;
-        } else {
-          document.getElementById("chancePerHour").textContent = "Unavailable";
-        }
+      // ✅ use raw hashrate value for local calc
+      if (data.hashrate1hrRaw && !isNaN(data.hashrate1hrRaw)) {
+        const hashrateTH = data.hashrate1hrRaw / 1e12; // H/s → TH/s
+        const odds = calculateSoloOdds(hashrateTH);
+        document.getElementById("chancePerHour").textContent = odds.chancePerHour;
       } else {
         document.getElementById("chancePerHour").textContent = "Unavailable";
       }
@@ -119,6 +117,7 @@ function handleAddressSubmit() {
   }
 }
 
+// unlock sound hack
 const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
 silentAudio.play();
 
