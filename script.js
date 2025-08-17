@@ -82,7 +82,6 @@ function updateStats(address) {
       document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
       document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
-
       document.getElementById("chancePerBlock").textContent = data.chancePerBlock ?? "Unavailable";
       document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
       document.getElementById("timeEstimate").textContent = data.timeEstimate
@@ -90,18 +89,18 @@ function updateStats(address) {
         : "Unavailable";
 
       const rawHashrate = data.hashrate1hr;
-if (rawHashrate && typeof rawHashrate === "string" && /\d/.test(rawHashrate)) {
-  const hashrateTH = parseFloat(rawHashrate.replace(/[^\d.]/g, ""));
-  if (!isNaN(hashrateTH)) {
-    const odds = calculateSoloOdds(hashrateTH);
-    document.getElementById("chancePerHour").textContent = odds.chancePerHour;
-  } else {
-    document.getElementById("chancePerHour").textContent = "Unavailable";
-  }
-} else {
-  document.getElementById("chancePerHour").textContent = "Unavailable";
-}
-
+      console.log("Raw hashrate1hr:", rawHashrate);
+      if (rawHashrate && typeof rawHashrate === "string" && /\d/.test(rawHashrate)) {
+        const hashrateTH = parseFloat(rawHashrate.replace(/[^\d.]/g, ""));
+        if (!isNaN(hashrateTH)) {
+          const odds = calculateSoloOdds(hashrateTH);
+          document.getElementById("chancePerHour").textContent = odds.chancePerHour;
+        } else {
+          document.getElementById("chancePerHour").textContent = "Unavailable";
+        }
+      } else {
+        document.getElementById("chancePerHour").textContent = "Unavailable";
+      }
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
