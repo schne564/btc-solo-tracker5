@@ -6,26 +6,6 @@ function formatWithSuffix(value) {
   return value?.toLocaleString?.() ?? "Unavailable";
 }
 
-function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907;
-  const blocksPerDay = 144;
-
-  const userHashrateH = userHashrateTH * 1e12;
-  const networkHashrateH = networkHashrateEH * 1e18;
-
-  const chancePerBlock = userHashrateH / networkHashrateH;
-  const oddsPerBlock = 1 / chancePerBlock;
-
-  const chancePerDay = chancePerBlock * blocksPerDay;
-  const oddsPerDay = 1 / chancePerDay;
-
-  return {
-    chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
-    chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
-    timeEstimate: `${oddsPerDay.toFixed(2)} days`
-  };
-}
-
 function sanitizeOdds(value) {
   if (!value || typeof value !== "string") return "Unavailable";
   if (value.includes("e+") || value.includes("Infinity") || value === "0.00000000%") return "Unavailable";
