@@ -42,7 +42,7 @@ function handleAddressSubmit() {
 
 // Optional: Load default address on page load
 window.onload = () => {
-  updateStats("yourDefaultBTCaddress"); // Replace with a fallback address if desired
+  updateStats("bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn"); // Replace with a fallback address if desired
   setInterval(() => {
     const currentAddress = document.getElementById("bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn").value.trim();
     if (currentAddress) updateStats(currentAddress);
