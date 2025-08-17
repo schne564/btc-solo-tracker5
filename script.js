@@ -1,13 +1,14 @@
 function formatWithSuffix(value) {
+  if (typeof value !== "number") return value ?? "Unavailable";
   if (value >= 1e12) return (value / 1e12).toFixed(2) + " T";
   if (value >= 1e9) return (value / 1e9).toFixed(2) + " G";
   if (value >= 1e6) return (value / 1e6).toFixed(2) + " M";
   if (value >= 1e3) return (value / 1e3).toFixed(2) + " K";
-  return value?.toLocaleString?.() ?? "Unavailable";
+  return value.toLocaleString();
 }
 
 function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907;
+  const networkHashrateEH = 907; // network hashrate ~ 907 EH/s
   const blocksPerDay = 144;
   const userHashrateH = userHashrateTH * 1e12;
   const networkHashrateH = networkHashrateEH * 1e18;
@@ -15,7 +16,7 @@ function calculateSoloOdds(userHashrateTH) {
   const oddsPerBlock = 1 / chancePerBlock;
   const chancePerDay = chancePerBlock * blocksPerDay;
   const oddsPerDay = 1 / chancePerDay;
-  const oddsPerHour = oddsPerDay / 24;
+  const oddsPerHour = 1 / (chancePerDay / 24);
 
   return {
     chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
@@ -49,20 +50,17 @@ function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
     .then((res) => {
-      console.log("Response headers:", res.headers);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const contentType = res.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error(`Invalid content-type: ${contentType}`);
-      }
       return res.json();
     })
     .then((data) => {
       console.log("Fetched data:", data);
 
+      // direct values
       document.getElementById("address").textContent = data.address ?? "Unavailable";
-      document.getElementById("workers").textContent = formatWithSuffix(data.workers);
+      document.getElementById("workers").textContent = data.workers ?? "Unavailable";
 
+      // shares
       const newBestShare = parseFloat(data.bestshare);
       document.getElementById("bestshare").textContent = formatWithSuffix(newBestShare);
       if (newBestShare > previousBestShare) {
@@ -70,27 +68,28 @@ function updateStats(address) {
         previousBestShare = newBestShare;
       }
 
-      const newShares = parseFloat(data.shares);
+      const newShares = parseFloat(data.shares ?? 0);
       document.getElementById("shares").textContent = formatWithSuffix(newShares);
       if (newShares > previousShares) {
         notifyMilestone("shares", `📈 Shares Increased: ${formatWithSuffix(newShares)}`);
         previousShares = newShares;
       }
 
-      document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
-      document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
+      // don’t format difficulty or block
+      document.getElementById("difficulty").textContent = data.difficulty ?? "Unavailable";
+      document.getElementById("lastBlock").textContent = data.lastBlock ?? "Unavailable";
+
       document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
       document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
       document.getElementById("chancePerBlock").textContent = data.chancePerBlock ?? "Unavailable";
       document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
-      document.getElementById("timeEstimate").textContent = data.timeEstimate
-        ? `${(parseFloat(data.timeEstimate) / 365).toFixed(2)} years`
-        : "Unavailable";
+      document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
 
+      // recalc local odds if hashrate present
       const rawHashrate = data.hashrate1hr;
-      console.log("Raw hashrate1hr:", rawHashrate);
-      if (rawHashrate && typeof rawHashrate === "string" && /\d/.test(rawHashrate)) {
+      if (rawHashrate && /\d/.test(rawHashrate)) {
+        // expect "126 TH/s"
         const hashrateTH = parseFloat(rawHashrate.replace(/[^\d.]/g, ""));
         if (!isNaN(hashrateTH)) {
           const odds = calculateSoloOdds(hashrateTH);
@@ -102,7 +101,8 @@ function updateStats(address) {
         document.getElementById("chancePerHour").textContent = "Unavailable";
       }
 
-      document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
+      document.getElementById("lastUpdated").textContent =
+        "Last updated: " + new Date().toLocaleTimeString();
     })
     .catch((err) => {
       console.error("Error fetching data:", err);
@@ -120,7 +120,7 @@ function handleAddressSubmit() {
 }
 
 const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
-silentAudio.play(); // triggers audio context
+silentAudio.play();
 
 let soundUnlocked = false;
 function unlockSound() {
