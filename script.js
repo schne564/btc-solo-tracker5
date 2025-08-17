@@ -41,11 +41,9 @@ function updateStats(address) {
       document.getElementById("soloChance").textContent = data.soloChance;
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
-
-      const odds = calculateSoloOdds(parseFloat(data.hashrate1hrRaw));
-      setOddsWithTooltip("chancePerBlock", odds.chancePerBlock);
-      setOddsWithTooltip("chancePerDay", odds.chancePerDay);
-      setOddsWithTooltip("timeEstimate", odds.timeEstimate);
+      document.getElementById("chancePerBlock").textContent = data.chancePerBlock;
+      document.getElementById("chancePerDay").textContent = data.chancePerDay;
+      document.getElementById("timeEstimate").textContent = data.timeEstimate;
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
