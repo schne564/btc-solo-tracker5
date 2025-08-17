@@ -115,6 +115,21 @@ button:hover {
   font-size: 0.9rem;
   color: #60a5fa;
 }
+#milestoneBanner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffcc00;
+  color: black;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #000;
+  z-index: 9999;
+  display: none;
+}
+
 @media (max-width: 480px) {
   h1 {
     font-size: 1.4rem;
