@@ -89,13 +89,19 @@ function updateStats(address) {
         ? `${(parseFloat(data.timeEstimate) / 365).toFixed(2)} years`
         : "Unavailable";
 
-      const hashrateTH = parseFloat(data.hashrate1hr?.replace(/[^\d.]/g, ""));
-      if (!isNaN(hashrateTH)) {
-        const odds = calculateSoloOdds(hashrateTH);
-        document.getElementById("chancePerHour").textContent = odds.chancePerHour;
-      } else {
-        document.getElementById("chancePerHour").textContent = "Unavailable";
-      }
+      const rawHashrate = data.hashrate1hr;
+if (rawHashrate && typeof rawHashrate === "string" && /\d/.test(rawHashrate)) {
+  const hashrateTH = parseFloat(rawHashrate.replace(/[^\d.]/g, ""));
+  if (!isNaN(hashrateTH)) {
+    const odds = calculateSoloOdds(hashrateTH);
+    document.getElementById("chancePerHour").textContent = odds.chancePerHour;
+  } else {
+    document.getElementById("chancePerHour").textContent = "Unavailable";
+  }
+} else {
+  document.getElementById("chancePerHour").textContent = "Unavailable";
+}
+
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
