@@ -19,7 +19,7 @@ function calculateSoloOdds(userHashrateTH) {
   return {
     chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
     chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
-    timeEstimate: `${oddsPerDay.toFixed(2)} days`
+    timeEstimate: `${(oddsPerDay / 365).toFixed(2)} years`
   };
 }
 
