@@ -6,9 +6,8 @@ function formatWithSuffix(value) {
   return value?.toLocaleString?.() ?? "Unavailable";
 }
 
-const endpoint = "https://broad-cell-151e.schne564.workers.dev/";
-
-function updateStats() {
+function updateStats(address) {
+  const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
     .then((res) => res.json())
     .then((data) => {
@@ -32,8 +31,20 @@ function updateStats() {
     });
 }
 
-// Initial fetch
-updateStats();
+function handleAddressSubmit() {
+  const address = document.getElementById("btcAddressInput").value.trim();
+  if (address) {
+    updateStats(address);
+  } else {
+    alert("Please enter a valid BTC address.");
+  }
+}
 
-// Auto-refresh every 30 seconds
-setInterval(updateStats, 30000);
+// Optional: Load default address on page load
+window.onload = () => {
+  updateStats("yourDefaultBTCaddress"); // Replace with a fallback address if desired
+  setInterval(() => {
+    const currentAddress = document.getElementById("btcAddressInput").value.trim();
+    if (currentAddress) updateStats(currentAddress);
+  }, 30000); // Auto-refresh every 30 seconds
+};
