@@ -48,9 +48,14 @@ function notifyMilestone(elementId, message) {
 function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      return res.json();
+    })
     .then((data) => {
-      document.getElementById("address").textContent = data.address;
+      console.log("Fetched data:", data); // ✅ Debug log
+
+      document.getElementById("address").textContent = data.address ?? "Unavailable";
       document.getElementById("workers").textContent = formatWithSuffix(data.workers);
 
       const newBestShare = parseFloat(data.bestshare);
@@ -69,9 +74,9 @@ function updateStats(address) {
 
       document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
       document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
-      document.getElementById("soloChance").textContent = data.soloChance;
-      document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
-      document.getElementById("hashrate5m").textContent = data.hashrate5m;
+      document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
+      document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
+      document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
 
       document.getElementById("chancePerBlock").textContent = data.chancePerBlock ?? "Unavailable";
       document.getElementById("chancePerDay").textContent = data.chancePerDay ?? "Unavailable";
