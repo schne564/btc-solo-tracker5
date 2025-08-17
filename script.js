@@ -1,145 +1,143 @@
-function formatWithSuffix(value) {
-  if (typeof value !== "number") return value ?? "Unavailable";
-  if (value >= 1e12) return (value / 1e12).toFixed(2) + " T";
-  if (value >= 1e9) return (value / 1e9).toFixed(2) + " G";
-  if (value >= 1e6) return (value / 1e6).toFixed(2) + " M";
-  if (value >= 1e3) return (value / 1e3).toFixed(2) + " K";
-  return value.toLocaleString();
-}
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const address = url.searchParams.get("address") || "bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn";
 
-function calculateSoloOdds(userHashrateTH) {
-  const networkHashrateEH = 907;
-  const blocksPerDay = 144;
-  const userHashrateH = userHashrateTH * 1e12;
-  const networkHashrateH = networkHashrateEH * 1e18;
-  const chancePerBlock = userHashrateH / networkHashrateH;
-  const oddsPerBlock = 1 / chancePerBlock;
-  const chancePerDay = chancePerBlock * blocksPerDay;
-  const oddsPerDay = 1 / chancePerDay;
-  const oddsPerHour = 1 / (chancePerDay / 24);
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders()
+      });
+    }
 
+    try {
+      // --- CKPool User Data ---
+      const userRes = await fetch(`https://solo.ckpool.org/users/${address}`);
+      if (!userRes.ok) throw new Error("Failed to fetch CKPool user data");
+      const userData = await userRes.json();
+
+      // --- Bitcoin Network Difficulty ---
+      const diffRes = await fetch("https://blockchain.info/q/getdifficulty");
+      const difficulty = parseFloat(await diffRes.text());
+
+      // --- Latest Block Height ---
+      const blockRes = await fetch("https://blockchain.info/q/getblockcount");
+      const lastBlock = parseInt(await blockRes.text(), 10);
+
+      // --- Shares from userData ---
+      const shares = userData.shares || 0;
+
+      // --- Hashrate 5m ---
+      let hashrate5mHps = 0;
+      if (userData.hashrate5m && parseFloat(userData.hashrate5m) > 1e5) {
+        hashrate5mHps = parseFloat(userData.hashrate5m);
+      } else if (userData.workerList?.length > 0) {
+        for (const worker of userData.workerList) {
+          if (worker.hashrate5m) hashrate5mHps += parseFloat(worker.hashrate5m);
+        }
+      } else if (userData.hashrate5m) {
+        hashrate5mHps = parseFloat(userData.hashrate5m) * 1e12;
+      }
+
+      // --- Hashrate 1hr ---
+      let hashrateHps = 0;
+      if (userData.hashrate1hr && parseFloat(userData.hashrate1hr) > 1e5) {
+        hashrateHps = parseFloat(userData.hashrate1hr);
+      } else if (userData.workerList?.length > 0) {
+        for (const worker of userData.workerList) {
+          if (worker.hashrate1hr) {
+            hashrateHps += parseFloat(worker.hashrate1hr);
+          } else if (worker.hashrate) {
+            hashrateHps += parseFloat(worker.hashrate);
+          }
+        }
+      } else if (userData.hashrate1hr) {
+        hashrateHps = parseFloat(userData.hashrate1hr) * 1e12;
+      }
+
+      // --- Local Chance ---
+      const bestShare = parseFloat(userData.bestshare || 0);
+      let localChance = null;
+      if (bestShare > 0 && difficulty > 0) {
+        localChance = (bestShare / (difficulty * Math.pow(2, 32))) * 100;
+      }
+
+      // --- Solo Mining Stats ---
+      let chancePerBlock = "Unavailable";
+      let chancePerDay = "Unavailable";
+      let timeEstimate = "Unavailable";
+      let soloChance = "Unavailable";
+
+      if (hashrateHps > 0 && difficulty > 0) {
+        const targetHashes = difficulty * Math.pow(2, 32);
+        const blocksPerDay = 144;
+
+        const probPerBlock = targetHashes / hashrateHps;
+        const probPerDay = targetHashes / (hashrateHps * blocksPerDay);
+
+        chancePerBlock = `1 in ${formatLargeNumber(probPerBlock)}`;
+        chancePerDay = `1 in ${formatLargeNumber(probPerDay)}`;
+        timeEstimate = `${(probPerBlock / blocksPerDay).toFixed(2)} days`;
+        soloChance = `${(1 / probPerDay * 100).toFixed(8)}%`;
+      }
+
+      // --- Final JSON Output ---
+      return new Response(JSON.stringify({
+        address,
+        bestshare: bestShare,
+        shares, // NEW FIELD
+        workers: userData.workers || 0,
+        workerList: userData.workerList || [],
+        difficulty: formatDifficulty(difficulty),
+        lastBlock,
+        localChance,
+        soloChance,
+        chancePerBlock,
+        chancePerDay,
+        timeEstimate,
+        hashrate1hr: hashrateHps > 0 ? formatHashrate(hashrateHps) : "Unavailable",
+        hashrate5m: hashrate5mHps > 0 ? formatHashrate(hashrate5mHps) : "Unavailable"
+      }), { headers: corsHeaders() });
+
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message }), {
+        status: 500,
+        headers: corsHeaders()
+      });
+    }
+  }
+};
+
+function corsHeaders() {
   return {
-    chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
-    chancePerHour: `1 in ${Math.round(oddsPerHour).toLocaleString()}`,
-    chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
-    timeEstimate: `${(oddsPerDay / 365).toFixed(2)} years`
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "*"
   };
 }
 
-let previousBestShare = 0;
-let previousShares = 0;
-
-function notifyMilestone(elementId, message) {
-  const elem = document.getElementById(elementId);
-  elem.classList.add("highlight", "pulse");
-  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
-  audio.play();
-  const banner = document.getElementById("milestoneBanner");
-  banner.textContent = message;
-  banner.style.display = "block";
-  setTimeout(() => {
-    elem.classList.remove("highlight", "pulse");
-    banner.style.display = "none";
-  }, 3000);
+function formatDifficulty(diff) {
+  if (diff >= 1e12) return (diff / 1e12).toFixed(2) + "T";
+  if (diff >= 1e9) return (diff / 1e9).toFixed(2) + "G";
+  if (diff >= 1e6) return (diff / 1e6).toFixed(2) + "M";
+  return diff.toFixed(2);
 }
 
-function updateStats(address) {
-  const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
-  fetch(endpoint)
-    .then((res) => {
-     // if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      return res.json();
-    })
-    .then((data) => {
-      console.log("Fetched data:", data);
-
-      document.getElementById("address").textContent = data.address ?? "Unavailable";
-      document.getElementById("workers").textContent = data.workers ?? "Unavailable";
-
-      const newBestShare = parseFloat(data.bestshare);
-      document.getElementById("bestshare").textContent = formatWithSuffix(newBestShare);
-      if (newBestShare > previousBestShare) {
-        notifyMilestone("bestshare", `🎉 New Best Share: ${formatWithSuffix(newBestShare)}`);
-        previousBestShare = newBestShare;
-      }
-
-      const newShares = parseFloat(data.shares ?? 0);
-      document.getElementById("shares").textContent = formatWithSuffix(newShares);
-      if (newShares > previousShares) {
-        notifyMilestone("shares", `📈 Shares Increased: ${formatWithSuffix(newShares)}`);
-        previousShares = newShares;
-      }
-
-      document.getElementById("difficulty").textContent = data.difficulty ?? "Unavailable";
-      document.getElementById("lastBlock").textContent = data.lastBlock ?? "Unavailable";
-      document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
-      document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
-      document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
-
-      let hashrateTH = null;
-
-      if (typeof data.hashrate1hrRaw === "number" && !isNaN(data.hashrate1hrRaw)) {
-        hashrateTH = data.hashrate1hrRaw / 1e12;
-      } else if (data.hashrate1hr && typeof data.hashrate1hr === "string") {
-        const cleaned = data.hashrate1hr.replace(/[^\d.]/g, "");
-        const parsed = parseFloat(cleaned);
-        if (!isNaN(parsed)) {
-          hashrateTH = parsed;
-        }
-      }
-
-      if (hashrateTH && !isNaN(hashrateTH)) {
-        const odds = calculateSoloOdds(hashrateTH);
-        document.getElementById("chancePerHour").textContent = odds.chancePerHour;
-        document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
-        document.getElementById("chancePerDay").textContent = odds.chancePerDay;
-        document.getElementById("timeEstimate").textContent = odds.timeEstimate;
-      } else {
-        document.getElementById("chancePerHour").textContent = "Unavailable";
-        document.getElementById("chancePerBlock").textContent = "Unavailable";
-        document.getElementById("chancePerDay").textContent = "Unavailable";
-        document.getElementById("timeEstimate").textContent = "Unavailable";
-      }
-
-      document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
-    })
-    .catch((err) => {
-      console.error("Error fetching data:", err);
-      document.getElementById("lastUpdated").textContent = "Error fetching data";
-    });
-}
-
-function handleAddressSubmit() {
-  const address = document.getElementById("btcAddressInput").value.trim();
-  if (address) {
-    updateStats(address);
-  } else {
-    alert("Please enter a valid BTC address.");
+function formatHashrate(hps) {
+  const units = ["H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s"];
+  let i = 0;
+  while (hps >= 1000 && i < units.length - 1) {
+    hps /= 1000;
+    i++;
   }
+  return `${hps.toFixed(2)} ${units[i]}`;
 }
 
-const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
-silentAudio.play();
-
-let soundUnlocked = false;
-function unlockSound() {
-  if (soundUnlocked) return;
-  soundUnlocked = true;
-  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
-  audio.play().catch(() => {
-    console.warn("Audio unlock attempt failed.");
-  });
+function formatLargeNumber(num) {
+  if (num >= 1e12) return (num / 1e12).toFixed(2) + "T";
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + "G";
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
+  return num.toFixed(2);
 }
-
-document.addEventListener("click", unlockSound);
-document.addEventListener("touchstart", unlockSound);
-
-window.onload = () => {
-  const defaultAddress = "bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn";
-  document.getElementById("btcAddressInput").value = defaultAddress;
-  updateStats(defaultAddress);
-  setInterval(() => {
-    const currentAddress = document.getElementById("btcAddressInput").value.trim();
-    if (currentAddress) updateStats(currentAddress);
-  }, 5000);
-};
