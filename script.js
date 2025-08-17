@@ -75,7 +75,7 @@ function updateStats(address) {
 
       const hashrate1hr = parseFloat(data.hashrate1hr);
       if (!isNaN(hashrate1hr)) {
-        const odds = calculateSoloOdds(hashrate1hr);
+        const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
         document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
         document.getElementById("chancePerDay").textContent = odds.chancePerDay;
         document.getElementById("chancePerHour").textContent = odds.chancePerHour;
