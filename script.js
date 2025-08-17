@@ -5,6 +5,25 @@ function formatWithSuffix(value) {
   if (value >= 1e3) return (value / 1e3).toFixed(2) + " K";
   return value?.toLocaleString?.() ?? "Unavailable";
 }
+function calculateSoloOdds(userHashrateTH) {
+  const networkHashrateEH = 907; // Current network hashrate in EH/s
+  const blocksPerDay = 144;
+
+  const userHashrateH = userHashrateTH * 1e12;
+  const networkHashrateH = networkHashrateEH * 1e18;
+
+  const chancePerBlock = userHashrateH / networkHashrateH;
+  const oddsPerBlock = 1 / chancePerBlock;
+
+  const chancePerDay = chancePerBlock * blocksPerDay;
+  const oddsPerDay = 1 / chancePerDay;
+
+  return {
+    chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
+    chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
+    timeEstimate: `${oddsPerDay.toFixed(2)} days`
+  };
+}
 
 function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
@@ -20,9 +39,10 @@ function updateStats(address) {
       document.getElementById("soloChance").textContent = data.soloChance;
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
-      document.getElementById("chancePerBlock").textContent = data.chancePerBlock;
-      document.getElementById("chancePerDay").textContent = data.chancePerDay;
-      document.getElementById("timeEstimate").textContent = data.timeEstimate;
+      const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
+      document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
+      document.getElementById("chancePerDay").textContent = odds.chancePerDay;
+      document.getElementById("timeEstimate").textContent = odds.timeEstimate;
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
     .catch((err) => {
