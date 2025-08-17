@@ -35,10 +35,10 @@ function updateStats(address) {
         previousBestShare = newBestShare;
       }
 
-      document.getElementById("shares").textContent = formatWithSuffix(data.shares);
-      document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
-      document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
-      document.getElementById("soloChance").textContent = sanitizeOdds(data.soloChance);
+      document.getElementById("shares").textContent = data.shares;
+      document.getElementById("difficulty").textContent = data.difficulty;
+      document.getElementById("lastBlock").textContent = data.lastBlock;
+      document.getElementById("soloChance").textContent = data.soloChance;
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
 
