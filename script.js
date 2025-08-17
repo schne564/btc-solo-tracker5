@@ -80,6 +80,7 @@ function updateStats(address) {
       const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
       document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
       document.getElementById("chancePerDay").textContent = odds.chancePerDay;
+      document.getElementById("chancePerHour").textContent = stats.chancePerHour;
       document.getElementById("timeEstimate").textContent = odds.timeEstimate;
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
