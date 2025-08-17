@@ -44,7 +44,7 @@ function handleAddressSubmit() {
 window.onload = () => {
   updateStats("yourDefaultBTCaddress"); // Replace with a fallback address if desired
   setInterval(() => {
-    const currentAddress = document.getElementById("btcAddressInput").value.trim();
+    const currentAddress = document.getElementById("bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn").value.trim();
     if (currentAddress) updateStats(currentAddress);
   }, 30000); // Auto-refresh every 30 seconds
 };
