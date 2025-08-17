@@ -38,8 +38,8 @@ function updateStats(address) {
       document.getElementById("shares").textContent = formatWithSuffix(data.shares);
       document.getElementById("difficulty").textContent = formatWithSuffix(data.difficulty);
       document.getElementById("lastBlock").textContent = formatWithSuffix(data.lastBlock);
-      document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
-      document.getElementById("hashrate5m").textContent = data.hashrate5m;
+      document.getElementById("hashrate1hr").textContent = stats.hashrate1hr;
+      document.getElementById("hashrate5m").textContent = stats.hashrate5m;
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
