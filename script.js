@@ -32,12 +32,12 @@ function calculateSoloOdds(userHashrateTH) {
 //  return value;
 //}
 
-function setOddsWithTooltip(id, value) {
-  const el = document.getElementById(id);
-  const sanitized = sanitizeOdds(value);
-  el.textContent = sanitized;
-  el.title = sanitized === "Unavailable" ? "Odds too small to display meaningfully" : value;
-}
+// function setOddsWithTooltip(id, value) {
+//   const el = document.getElementById(id);
+//  const sanitized = sanitizeOdds(value);
+ // el.textContent = sanitized;
+//  el.title = sanitized === "Unavailable" ? "Odds too small to display meaningfully" : value;
+// }
 
 let previousBestShare = 0;
 
