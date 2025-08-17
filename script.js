@@ -49,11 +49,16 @@ function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
     .then((res) => {
+      console.log("Response headers:", res.headers);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(`Invalid content-type: ${contentType}`);
+      }
       return res.json();
     })
     .then((data) => {
-      console.log("Fetched data:", data); // ✅ Debug log
+      console.log("Fetched data:", data);
 
       document.getElementById("address").textContent = data.address ?? "Unavailable";
       document.getElementById("workers").textContent = formatWithSuffix(data.workers);
