@@ -17,14 +17,12 @@ function calculateSoloOdds(userHashrateTH) {
   const oddsPerDay = 1 / chancePerDay;
   const oddsPerHour = oddsPerDay / 24;
 
-
   return {
-  chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
-  chancePerHour: `1 in ${Math.round(oddsPerHour).toLocaleString()}`,
-  chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
-  timeEstimate: `${(oddsPerDay / 365).toFixed(2)} years`
-};
-
+    chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
+    chancePerHour: `1 in ${Math.round(oddsPerHour).toLocaleString()}`,
+    chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
+    timeEstimate: `${(oddsPerDay / 365).toFixed(2)} years`
+  };
 }
 
 let previousBestShare = 0;
@@ -34,8 +32,8 @@ function notifyMilestone(elementId, message) {
   const elem = document.getElementById(elementId);
   elem.classList.add("highlight", "pulse");
 
- const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
- audio.play();
+  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
+  audio.play();
 
   const banner = document.getElementById("milestoneBanner");
   banner.textContent = message;
@@ -46,8 +44,6 @@ function notifyMilestone(elementId, message) {
     banner.style.display = "none";
   }, 3000);
 }
-
-
 
 function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
@@ -77,11 +73,19 @@ function updateStats(address) {
       document.getElementById("hashrate1hr").textContent = data.hashrate1hr;
       document.getElementById("hashrate5m").textContent = data.hashrate5m;
 
-      const odds = calculateSoloOdds(parseFloat(data.hashrate1hr));
-      document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
-      document.getElementById("chancePerDay").textContent = odds.chancePerDay;
-      document.getElementById("chancePerHour").textContent = odds.chancePerHour;
-      document.getElementById("timeEstimate").textContent = odds.timeEstimate;
+      const hashrate1hr = parseFloat(data.hashrate1hr);
+      if (!isNaN(hashrate1hr)) {
+        const odds = calculateSoloOdds(hashrate1hr);
+        document.getElementById("chancePerBlock").textContent = odds.chancePerBlock;
+        document.getElementById("chancePerDay").textContent = odds.chancePerDay;
+        document.getElementById("chancePerHour").textContent = odds.chancePerHour;
+        document.getElementById("timeEstimate").textContent = odds.timeEstimate;
+      } else {
+        document.getElementById("chancePerBlock").textContent = "Unavailable";
+        document.getElementById("chancePerDay").textContent = "Unavailable";
+        document.getElementById("chancePerHour").textContent = "Unavailable";
+        document.getElementById("timeEstimate").textContent = "Unavailable";
+      }
 
       document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
     })
@@ -99,23 +103,21 @@ function handleAddressSubmit() {
     alert("Please enter a valid BTC address.");
   }
 }
+
 const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
 silentAudio.play(); // triggers audio context
-// Unlock sound on first user interaction
-let soundUnlocked = false;
 
+let soundUnlocked = false;
 function unlockSound() {
   if (soundUnlocked) return;
   soundUnlocked = true;
 
   const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
   audio.play().catch(() => {
-    // Some browsers may still block it silently
     console.warn("Audio unlock attempt failed.");
   });
 }
 
-// Attach to any user interaction
 document.addEventListener("click", unlockSound);
 document.addEventListener("touchstart", unlockSound);
 
