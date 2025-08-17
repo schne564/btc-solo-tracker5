@@ -15,12 +15,16 @@ function calculateSoloOdds(userHashrateTH) {
   const oddsPerBlock = 1 / chancePerBlock;
   const chancePerDay = chancePerBlock * blocksPerDay;
   const oddsPerDay = 1 / chancePerDay;
+  const oddsPerHour = oddsPerDay / 24;
+
 
   return {
-    chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
-    chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
-    timeEstimate: `${(oddsPerDay / 365).toFixed(2)} years`
-  };
+  chancePerBlock: `1 in ${Math.round(oddsPerBlock).toLocaleString()}`,
+  chancePerHour: `1 in ${Math.round(oddsPerHour).toLocaleString()}`,
+  chancePerDay: `1 in ${Math.round(oddsPerDay).toLocaleString()}`,
+  timeEstimate: `${(oddsPerDay / 365).toFixed(2)} years`
+};
+
 }
 
 let previousBestShare = 0;
