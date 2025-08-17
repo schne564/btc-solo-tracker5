@@ -47,7 +47,7 @@ function updateStats(address) {
   const endpoint = `https://broad-cell-151e.schne564.workers.dev/?address=${address}`;
   fetch(endpoint)
     .then((res) => {
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+     // if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       return res.json();
     })
     .then((data) => {
