@@ -30,7 +30,8 @@ function notifyMilestone(elementId, message) {
   const elem = document.getElementById(elementId);
   elem.classList.add("highlight", "pulse");
 
-  const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+  <button onclick="new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg').play()">Test Sound</button>
+
   audio.play();
 
   const banner = document.getElementById("milestoneBanner");
