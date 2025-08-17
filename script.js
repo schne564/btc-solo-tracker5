@@ -121,5 +121,5 @@ window.onload = () => {
   setInterval(() => {
     const currentAddress = document.getElementById("btcAddressInput").value.trim();
     if (currentAddress) updateStats(currentAddress);
-  }, 15000);
+  }, 10000);
 };
