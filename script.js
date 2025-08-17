@@ -94,6 +94,8 @@ function handleAddressSubmit() {
     alert("Please enter a valid BTC address.");
   }
 }
+const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...");
+silentAudio.play(); // triggers audio context
 
 window.onload = () => {
   const defaultAddress = "bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn";
