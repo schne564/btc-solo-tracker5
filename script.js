@@ -26,11 +26,11 @@ function calculateSoloOdds(userHashrateTH) {
   };
 }
 
-function sanitizeOdds(value) {
-  if (!value || typeof value !== "string") return "Unavailable";
-  if (value.includes("e+") || value.includes("Infinity") || value === "0.00000000%") return "Unavailable";
-  return value;
-}
+//function sanitizeOdds(value) {
+//  if (!value || typeof value !== "string") return "Unavailable";
+//  if (value.includes("e+") || value.includes("Infinity") || value === "0.00000000%") return "Unavailable";
+//  return value;
+//}
 
 function setOddsWithTooltip(id, value) {
   const el = document.getElementById(id);
