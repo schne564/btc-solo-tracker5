@@ -1,4 +1,4 @@
-const endpoint = "https://broad-cell-151e.schne564.workers.dev/";
+const endpoint = "https://broad-cell-151e.schne564.workers.dev//api?rate=151&unit=TH";
 
 async function fetchStats() {
   try {
