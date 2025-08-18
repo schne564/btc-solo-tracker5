@@ -1,4 +1,4 @@
-const endpoint = "https://your-cloudflare-worker-url.com/api";
+const endpoint = "https://broad-cell-151e.schne564.workers.dev/";
 
 async function fetchStats() {
   try {
