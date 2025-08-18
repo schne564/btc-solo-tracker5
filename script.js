@@ -1,21 +1,21 @@
-const wallet = "bc1qd6mfkav3yzztuhpq6qg0kfm5fc2ay7jvy52rdn";
-const endpoint = `https://your-cloudflare-worker-url.com/api?wallet=${wallet}`;
+const endpoint = "https://your-cloudflare-worker-url.com/api";
 
 async function fetchStats() {
   try {
     const res = await fetch(endpoint);
     const data = await res.json();
 
-    document.getElementById("workers").textContent = data.workers ?? "Unavailable";
-    document.getElementById("bestShare").textContent = data.bestShare ?? "Unavailable";
-    document.getElementById("shares").textContent = data.shares ?? "Unavailable";
+    document.getElementById("blockHeight").textContent = data.lastBlock ?? "Unavailable";
     document.getElementById("difficulty").textContent = data.difficulty ?? "Unavailable";
-    document.getElementById("lastBlock").textContent = data.lastBlock ?? "Unavailable";
+    document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
+    document.getElementById("chanceBlock").textContent = data.chancePerBlock ?? "Unavailable";
+    document.getElementById("chanceDay").textContent = data.chancePerDay ?? "Unavailable";
+    document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
     document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
     document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
-    document.getElementById("chanceBlock").textContent = data.chanceBlock ?? "Unavailable";
-    document.getElementById("chanceDay").textContent = data.chanceDay ?? "Unavailable";
-    document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
+    document.getElementById("bestShare").textContent = data.bestshare ?? "Unavailable";
+    document.getElementById("shares").textContent = data.shares ?? "Unavailable";
+    document.getElementById("workers").textContent = data.workers ?? "Unavailable";
     document.getElementById("lastUpdated").textContent = new Date().toLocaleString();
   } catch (err) {
     console.error("Fetch error:", err);
