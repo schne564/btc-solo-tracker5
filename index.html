@@ -10,6 +10,10 @@
 <body>
   <div class="container">
     <h1>BTC Solo Mining Tracker</h1>
+    <div class="input-group">
+      <input type="text" id="btcAddressInput" placeholder="Enter BTC address" />
+      <button onclick="handleAddressSubmit()">Check Stats</button>
+    </div>
     <p>Block Height: <span id="blockHeight">Loading...</span></p>
     <p>Network Difficulty: <span id="difficulty">Loading...</span></p>
     <p>Estimated Odds: <span id="soloChance">Calculating...</span></p>
