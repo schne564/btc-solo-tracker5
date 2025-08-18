@@ -1,3 +1,4 @@
+
 function formatWithSuffix(value) {
   if (value >= 1e12) return (value / 1e12).toFixed(2) + " T";
   if (value >= 1e9) return (value / 1e9).toFixed(2) + " G";
@@ -45,11 +46,11 @@ function updateStats(address) {
       document.getElementById("chancePerDay").textContent = data.chancePerDay;
       document.getElementById("timeEstimate").textContent = data.timeEstimate;
 
-      document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
-   })
- .catch((err) => {
-    console.error("Error fetching data:", err);
-      document.getElementById("lastUpdated").textContent = "Error fetching data";
+   //   document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleTimeString();
+  //  })
+ //   .catch((err) => {
+   //   console.error("Error fetching data:", err);
+     // document.getElementById("lastUpdated").textContent = "Error fetching data";
     });
 }
 
@@ -70,29 +71,4 @@ window.onload = () => {
     const currentAddress = document.getElementById("btcAddressInput").value.trim();
     if (currentAddress) updateStats(currentAddress);
   }, 5000);
-};const endpoint = "https://broad-cell-151e.schne564.workers.dev//api?rate=151&unit=TH";
-
-async function fetchStats() {
-  try {
-    const res = await fetch(endpoint);
-    const data = await res.json();
-
-    document.getElementById("blockHeight").textContent = data.lastBlock ?? "Unavailable";
-    document.getElementById("difficulty").textContent = data.difficulty ?? "Unavailable";
-    document.getElementById("soloChance").textContent = data.soloChance ?? "Unavailable";
-    document.getElementById("chanceBlock").textContent = data.chancePerBlock ?? "Unavailable";
-    document.getElementById("chanceDay").textContent = data.chancePerDay ?? "Unavailable";
-    document.getElementById("timeEstimate").textContent = data.timeEstimate ?? "Unavailable";
-    document.getElementById("hashrate1hr").textContent = data.hashrate1hr ?? "Unavailable";
-    document.getElementById("hashrate5m").textContent = data.hashrate5m ?? "Unavailable";
-    document.getElementById("bestShare").textContent = data.bestshare ?? "Unavailable";
-    document.getElementById("shares").textContent = data.shares ?? "Unavailable";
-    document.getElementById("workers").textContent = data.workers ?? "Unavailable";
-    document.getElementById("lastUpdated").textContent = new Date().toLocaleString();
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-}
-
-fetchStats();
-setInterval(fetchStats, 5000); // Refresh every 5 seconds
+};
