@@ -1,26 +1,34 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>BTC Solo Mining Tracker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>BTC Solo Mining Tracker</h1>
-    <p>Block Height: <span id="blockHeight">Loading...</span></p>
-    <p>Network Difficulty: <span id="difficulty">Loading...</span></p>
-    <p>Estimated Odds: <span id="soloChance">Calculating...</span></p>
-    <p>Chance Per Block: <span id="chanceBlock">Loading...</span></p>
-    <p>Chance Per Day: <span id="chanceDay">Loading...</span></p>
-    <p>Time Estimate: <span id="timeEstimate">Loading...</span></p>
-    <p>Hashrate (1hr): <span id="hashrate1hr">Loading...</span></p>
-    <p>Hashrate (5m): <span id="hashrate5m">Loading...</span></p>
-    <p>Best Share: <span id="bestShare">Loading...</span></p>
-    <p>Shares: <span id="shares">Loading...</span></p>
-    <p>Workers: <span id="workers">Loading...</span></p>
-    <p>Last Updated: <span id="lastUpdated">Loading...</span></p>
+    <div class="input-group">
+      <input type="text" id="btcAddressInput" placeholder="Enter BTC address" />
+      <button onclick="handleAddressSubmit()">Check Stats</button>
+    </div>
+    <div class="stats">
+      <div><span>Wallet:</span> <span id="address">Unavailable</span></div>
+      <div><span>Workers:</span> <span id="workers">Unavailable</span></div>
+      <div><span>Best Share:</span> <span id="bestshare">Unavailable</span></div>
+      <div><span>Shares:</span> <span id="shares">Unavailable</span></div>
+      <div><span>Difficulty:</span> <span id="difficulty">Unavailable</span></div>
+      <div><span>Last Block:</span> <span id="lastBlock">Unavailable</span></div>
+<!--  <div><span>Solo Chance:</span> <span id="soloChance">Unavailable</span></div> -->
+      <div><span>Hashrate 1hr:</span> <span id="hashrate1hr">Unavailable</span></div>
+      <div><span>Hashrate 5m:</span> <span id="hashrate5m">Unavailable</span></div>
+      <div><span>Chance Per Block:</span> <span id="chancePerBlock">Unavailable</span></div>
+      <div><span>Chance Per Day:</span> <span id="chancePerDay">Unavailable</span></div> 
+      <div><span>Time Estimate:</span> <span id="timeEstimate">Unavailable</span></div>
+    </div>
+    <div class="updated" id="lastUpdated">Last updated: Unavailable</div>
   </div>
   <script src="script.js"></script>
 </body>
