@@ -23,4 +23,4 @@ async function fetchStats() {
 }
 
 fetchStats();
-setInterval(fetchStats, 30000); // Refresh every 30 seconds
+setInterval(fetchStats, 5000); // Refresh every 5 seconds
